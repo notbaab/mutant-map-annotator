@@ -90,6 +90,7 @@ func (c *Client) HandleMessage(event []byte) error {
 	err := json.Unmarshal(event, &message)
 	if err != nil {
 		Error.Printf("Got error %s", err.Error())
+		return err
 	}
 	return c.Room.doMessage(message, c)
 }

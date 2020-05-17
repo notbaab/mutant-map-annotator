@@ -74,7 +74,7 @@ func (r *Room) run() {
 func (r *Room) doMessage(message Message, srcClient *Client) error {
 	Trace.Printf("Got a thing %+v data is %s\n", message, string(*message.Data))
 	if message.Event == "state" {
-		// Should I reconnect everytime?
+		// Should I reconnect everytime? Maybe? Probably not
 		db := sqlx.MustConnect("sqlite3", srcClient.Room.db)
 		id := srcClient.Room.game.Id
 		game, err := GetGame(db, id)
@@ -92,13 +92,6 @@ func (r *Room) doMessage(message Message, srcClient *Client) error {
 			return err
 		}
 
-		// state, err := json.Marshal(game.GameData)
-		// if err != nil {
-		// 	Error.Printf("Couldn't marhsal game %d", id)
-		// 	return err
-		// }
-
-		// rawJsonData := json.RawMessage(state)
 		fullMessage := Message{Event: "state", Data: message.Data}
 		srcClient.send(fullMessage)
 
@@ -113,42 +106,7 @@ func (r *Room) doMessage(message Message, srcClient *Client) error {
 func (r *Room) AddClient(conn *websocket.Conn) (Client, error) {
 	client := NewClient(conn, r)
 
-	// Lazy loading, should cache it for later.
-	// grid, err := loadSheet()
-	// if err != nil {
-	// 	Error.Printf("Can't make connection message, bailing. Err: %s", err.Error())
-	// 	return client, err
-	// }
-	// gridJson, err := json.Marshal(grid)
-	// if err != nil {
-	// 	Error.Printf("Can't make connection message, bailing. Err: %s", err.Error())
-	// 	return client, err
-	// }
-	// state := GameState{GameMetaData: json.RawMessage(r.game.GameData), GameGridData: gridJson}
-
-	// rawState, err := json.Marshal(state)
-	// if err != nil {
-	// 	Error.Printf("Can't make connection message, bailing. Err: %s", err.Error())
-	// 	return client, err
-	// }
-	// rawJsonData := json.RawMessage(rawState)
-
-	// fullMessage := Message{Event: "state", Data: &rawJsonData}
-
-	// Error.Printf("Sblah")
-	// Error.Printf("%+v", r)
 	r.register <- &client
-
-	// if err != nil {
-	// 	Error.Printf("Can't make connection message, bailing. Err: %s", err.Error())
-	// 	return client, err
-	// }
-
-	// err = client.send(fullMessage)
-	// if err != nil {
-	// 	Error.Printf("Can't format connection message, bailing. Err: %s", err.Error())
-	// 	return client, err
-	// }
 
 	go client.readRoutine()
 	go client.writeRoutine()

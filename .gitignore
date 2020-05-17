@@ -3,3 +3,9 @@ node_modules/
 dist/
 credentials.json
 token.json
+frontend/
+frontend.old/
+data.db
+cli/cli
+testing/
+test-data
